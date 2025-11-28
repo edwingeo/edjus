@@ -1,0 +1,51 @@
+.logoContainer {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.logoImage {
+  width: 48px;
+  height: 48px;
+  flex-shrink: 0;
+  object-fit: contain;
+}
+
+.logoText {
+  display: flex;
+  flex-direction: column;
+  line-height: 1.2;
+}
+
+.edjusText {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: #ffa502;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+}
+
+.technologiesText {
+  font-size: 0.65rem;
+  font-weight: 400;
+  color: #b0b0b0;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  margin-top: -2px;
+}
+
+@media (max-width: 768px) {
+  .logoImage {
+    width: 40px;
+    height: 40px;
+  }
+
+  .edjusText {
+    font-size: 1.25rem;
+  }
+
+  .technologiesText {
+    font-size: 0.55rem;
+  }
+}
+

@@ -34,7 +34,7 @@ export default function ContactUs() {
         <div className={styles.heroContent}>
           <h1 className={styles.title}>Contact Us</h1>
           <p className={styles.subtitle}>
-            We'd love to hear from you. Get in touch with us today.
+            We&apos;d love to hear from you. Get in touch with us today.
           </p>
         </div>
       </div>

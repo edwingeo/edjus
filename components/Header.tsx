@@ -1,12 +1,18 @@
 'use client'
 
 import Link from 'next/link'
-import { usePathname } from 'next/navigation'
+import { usePathname, useRouter } from 'next/navigation'
 import styles from './Header.module.css'
 import Logo from './Logo'
 
 export default function Header() {
   const pathname = usePathname()
+  const router = useRouter()
+
+  const handleClick = () => {
+    console.log('Button clicked!')
+    router.push('/login')
+  }
 
   return (
     <header className={styles.header}>
@@ -38,12 +44,9 @@ export default function Header() {
           <button className={styles.actionButton}>
             Book a Quick call with us for Enquiry
           </button>
-          <Link href="/contact-us" className={styles.actionLink}>
-            Fix an appointment
-          </Link>
-          <Link href="/contact-us" className={styles.actionLink}>
-            Get Quote
-          </Link>
+          <button className={styles.actionButton} onClick={handleClick}>
+            Login/Register
+          </button>
         </div>
         <div className={styles.menuIcon}>
           <span></span>

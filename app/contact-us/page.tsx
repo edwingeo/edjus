@@ -34,7 +34,7 @@ export default function ContactUs() {
         <div className={styles.heroContent}>
           <h1 className={styles.title}>Contact Us</h1>
           <p className={styles.subtitle}>
-            We'd love to hear from you. Get in touch with us today.
+            We&apos;d love to hear from you. Get in touch with us today.
           </p>
         </div>
       </div>
@@ -49,9 +49,10 @@ export default function ContactUs() {
           <div className={styles.infoCard}>
             <div className={styles.infoIcon}>📱</div>
             <h3 className={styles.infoTitle}>Phone</h3>
-            <p className={styles.infoText}>+1 (555) 123-4567</p>
+            <p className={styles.infoText}>Edwin George : +1 (365) 378-2991</p>
+            <p className={styles.infoText}>Justin Jacob : +1 (306) 262-2648</p>
           </div>
-          <div className={styles.infoCard}>
+          {/* <div className={styles.infoCard}>
             <div className={styles.infoIcon}>📍</div>
             <h3 className={styles.infoTitle}>Address</h3>
             <p className={styles.infoText}>
@@ -59,7 +60,7 @@ export default function ContactUs() {
               Suite 100<br />
               City, Province, Canada
             </p>
-          </div>
+          </div> */}
         </div>
 
         <form className={styles.contactForm} onSubmit={handleSubmit}>

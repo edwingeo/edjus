@@ -2,59 +2,116 @@
 
 import Link from 'next/link'
 import { usePathname, useRouter } from 'next/navigation'
+import { useEffect, useState } from 'react'
 import styles from './Header.module.css'
 import Logo from './Logo'
+import LoginModal from './LoginModal'
+import RegisterModal from './RegisterModal'
 
 export default function Header() {
   const pathname = usePathname()
   const router = useRouter()
+  const [showLogin, setShowLogin] = useState(false)
+  const [showRegister, setShowRegister] = useState(false)
+  const [isLoggedIn, setIsLoggedIn] = useState(false)
 
-  const handleClick = () => {
-    console.log('Button clicked!')
-    router.push('/login')
+  useEffect(() => {
+    const checkSession = async () => {
+      try {
+        const res = await fetch('/api/session')
+        const data = await res.json().catch(() => ({}))
+        setIsLoggedIn(Boolean(data?.authenticated))
+      } catch (err) {
+        console.error('Failed to check session', err)
+      }
+    }
+    checkSession()
+  }, [])
+
+  const handleBookCall = () => {
+    router.push('/contact-us')
+  }
+
+  const handleLoginClick = () => {
+    if (isLoggedIn) {
+      fetch('/api/logout', { method: 'POST' })
+        .catch((err) => console.error('Failed to logout', err))
+        .finally(() => {
+          setIsLoggedIn(false)
+          router.push('/')
+        })
+      return
+    }
+    setShowRegister(false)
+    setShowLogin(true)
+  }
+
+  const handleSwitchToSignup = () => {
+    setShowLogin(false)
+    setShowRegister(true)
+  }
+
+  const handleSwitchToSignin = () => {
+    setShowLogin(true)
+    setShowRegister(false)
   }
 
   return (
-    <header className={styles.header}>
-      <div className={styles.container}>
-        <Link href="/" className={styles.logo}>
-          <Logo />
-        </Link>
-        <nav className={styles.nav}>
-          <Link
-            href="/"
-            className={`${styles.navLink} ${pathname === '/' ? styles.active : ''}`}
-          >
-            Home
+    <>
+      <header className={styles.header}>
+        <div className={styles.container}>
+          <Link href="/" className={styles.logo}>
+            <Logo />
           </Link>
-          <Link
-            href="/about-us"
-            className={`${styles.navLink} ${pathname === '/about-us' ? styles.active : ''}`}
-          >
-            Services
-          </Link>
-          <Link
-            href="/contact-us"
-            className={`${styles.navLink} ${pathname === '/contact-us' ? styles.active : ''}`}
-          >
-            Contact Us
-          </Link>
-        </nav>
-        <div className={styles.actions}>
-          <button className={styles.actionButton}>
-            Book a Quick call with us for Enquiry
-          </button>
-          <button className={styles.actionButton} onClick={handleClick}>
-            Login/Register
-          </button>
+          <nav className={styles.nav}>
+            <Link
+              href="/"
+              className={`${styles.navLink} ${pathname === '/' ? styles.active : ''}`}
+            >
+              Home
+            </Link>
+            <Link
+              href="/about-us"
+              className={`${styles.navLink} ${pathname === '/about-us' ? styles.active : ''}`}
+            >
+              Services
+            </Link>
+            <Link
+              href="/contact-us"
+              className={`${styles.navLink} ${pathname === '/contact-us' ? styles.active : ''}`}
+            >
+              Contact Us
+            </Link>
+          </nav>
+          <div className={styles.actions}>
+            <button className={styles.actionButton} onClick={handleBookCall}>
+              Book a Quick call with us for Enquiry
+            </button>
+            <button
+              className={styles.actionButton}
+              onClick={handleLoginClick}
+            >
+              {isLoggedIn ? 'Logout' : 'Login/Register'}
+            </button>
+          </div>
+          <div className={styles.menuIcon}>
+            <span></span>
+            <span></span>
+            <span></span>
+          </div>
         </div>
-        <div className={styles.menuIcon}>
-          <span></span>
-          <span></span>
-          <span></span>
-        </div>
-      </div>
-    </header>
+      </header>
+      <LoginModal
+        open={showLogin}
+        onClose={() => setShowLogin(false)}
+        onLoginSuccess={() => setIsLoggedIn(true)}
+        onSwitchToSignup={handleSwitchToSignup}
+      />
+      <RegisterModal
+        open={showRegister}
+        onClose={() => setShowRegister(false)}
+        onSwitchToSignin={handleSwitchToSignin}
+      />
+    </>
   )
 }
-

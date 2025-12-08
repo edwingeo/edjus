@@ -51,6 +51,15 @@
   margin-bottom: 12px;
 }
 
+.success {
+  background: #22d348;
+  border: 1px solid #0012b0;
+  color: #b4d3fb;
+  border-radius: 8px;
+  padding: 10px 12px;
+  margin-bottom: 12px;
+}
+
 .form {
   display: flex;
   flex-direction: column;
@@ -77,6 +86,31 @@
 .label input:focus {
   outline: 2px solid var(--accent-orange);
   border-color: transparent;
+}
+
+.label select {
+  width: 100%;
+  padding: 10px 40px 10px 12px;
+  border-radius: 8px;
+  border: 1px solid #2f2f2f;
+  background: #1a1a1a
+    url("data:image/svg+xml,%3Csvg width='20' height='20' viewBox='0 0 24 24' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M6 9L12 15L18 9' stroke='%23f8f8f8' stroke-width='1.7' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E")
+    no-repeat right 12px center;
+  color: #f8f8f8;
+  appearance: none;
+  cursor: pointer;
+  transition: border-color 0.15s ease, outline-color 0.15s ease, box-shadow 0.15s ease;
+}
+
+.label select:focus {
+  outline: 2px solid var(--accent-orange);
+  border-color: transparent;
+  box-shadow: 0 0 0 3px rgba(255, 107, 53, 0.2);
+}
+
+.label option {
+  background: #0f0f0f;
+  color: #f8f8f8;
 }
 
 .row {

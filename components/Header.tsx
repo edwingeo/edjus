@@ -6,16 +6,26 @@ import { useEffect, useState } from 'react'
 import styles from './Header.module.css'
 import Logo from './Logo'
 import LoginModal from './LoginModal'
+import RegisterModal from './RegisterModal'
 
 export default function Header() {
   const pathname = usePathname()
   const router = useRouter()
   const [showLogin, setShowLogin] = useState(false)
+  const [showRegister, setShowRegister] = useState(false)
   const [isLoggedIn, setIsLoggedIn] = useState(false)
 
   useEffect(() => {
-    const token = typeof window !== 'undefined' ? localStorage.getItem('token') : null
-    setIsLoggedIn(Boolean(token))
+    const checkSession = async () => {
+      try {
+        const res = await fetch('/api/session')
+        const data = await res.json().catch(() => ({}))
+        setIsLoggedIn(Boolean(data?.authenticated))
+      } catch (err) {
+        console.error('Failed to check session', err)
+      }
+    }
+    checkSession()
   }, [])
 
   const handleBookCall = () => {
@@ -24,12 +34,26 @@ export default function Header() {
 
   const handleLoginClick = () => {
     if (isLoggedIn) {
-      localStorage.removeItem('token')
-      setIsLoggedIn(false)
-      router.push('/')
+      fetch('/api/logout', { method: 'POST' })
+        .catch((err) => console.error('Failed to logout', err))
+        .finally(() => {
+          setIsLoggedIn(false)
+          router.push('/')
+        })
       return
     }
+    setShowRegister(false)
     setShowLogin(true)
+  }
+
+  const handleSwitchToSignup = () => {
+    setShowLogin(false)
+    setShowRegister(true)
+  }
+
+  const handleSwitchToSignin = () => {
+    setShowLogin(true)
+    setShowRegister(false)
   }
 
   return (
@@ -81,6 +105,12 @@ export default function Header() {
         open={showLogin}
         onClose={() => setShowLogin(false)}
         onLoginSuccess={() => setIsLoggedIn(true)}
+        onSwitchToSignup={handleSwitchToSignup}
+      />
+      <RegisterModal
+        open={showRegister}
+        onClose={() => setShowRegister(false)}
+        onSwitchToSignin={handleSwitchToSignin}
       />
     </>
   )

@@ -1,4 +1,5 @@
 'use client'
+
 import { useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
 
@@ -12,52 +13,46 @@ export default function ProfilePage() {
   const router = useRouter()
   const [profile, setProfile] = useState<ProfileResponse | null>(null)
   const [error, setError] = useState<string | null>(null)
+  const [loading, setLoading] = useState(true)
 
   useEffect(() => {
     const controller = new AbortController()
 
-    const fetchData = async () => {
-      const token = localStorage.getItem('token')
-      if (!token) {
-        router.push('/')
-        return
-      }
-
+    const fetchProfile = async () => {
       try {
-        const res = await fetch('https://edjus-backend-1.onrender.com/auth/profile', {
-          method: 'GET',
-          headers: {
-            'Content-Type': 'application/json',
-            Accept: 'application/json',
-            Authorization: `Bearer ${token}`,
-          },
-          signal: controller.signal,
-        })
+        const res = await fetch('/api/profile', { signal: controller.signal })
 
-        if (!res.ok) {
-          const message = `Request failed: ${res.status} ${res.statusText}`
-          setError(message)
-          console.error(message)
+        if (res.status === 401) {
+          router.push('/')
           return
         }
 
-        const data = (await res.json()) as ProfileResponse
+        const data = await res.json().catch(() => ({}))
+
+        if (!res.ok) {
+          setError(data?.message || 'Failed to load profile')
+          return
+        }
+
         setProfile(data)
       } catch (err) {
         if (!controller.signal.aborted) {
           setError('Network error while fetching profile')
-          console.error('Error:', err)
         }
+      } finally {
+        if (!controller.signal.aborted) setLoading(false)
       }
     }
 
-    fetchData()
+    fetchProfile()
+
     return () => controller.abort()
   }, [router])
 
   return (
     <div style={{ padding: '2rem', color: '#f8f8f8' }}>
       <h1 style={{ marginBottom: '1rem' }}>Profile</h1>
+      {loading && <p>Loading…</p>}
       {error && <p style={{ color: '#f87171' }}>{error}</p>}
       {profile && (
         <div

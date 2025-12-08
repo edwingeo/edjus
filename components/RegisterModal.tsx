@@ -4,27 +4,31 @@ import { useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import styles from './LoginModal.module.css'
 
-type LoginModalProps = {
+type RegisterModalProps = {
   open: boolean
   onClose: () => void
-  onLoginSuccess?: () => void
-  onSwitchToSignup?: () => void
+  onRegisterSuccess?: () => void
+  onSwitchToSignin?: () => void
 }
 
-export default function LoginModal({ open, onClose, onLoginSuccess, onSwitchToSignup }: LoginModalProps) {
+export default function RegisterModal({ open, onClose, onRegisterSuccess, onSwitchToSignin }: RegisterModalProps) {
   const router = useRouter()
   const [userName, setUserName] = useState('')
   const [password, setPassword] = useState('')
-  const [remember, setRemember] = useState(false)
+  const [confirmPassword, setConfirmPassword] = useState('')
+  const [role, setRole] = useState('')
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
+  const [success, setSuccess] = useState<string | null>(null)
 
   useEffect(() => {
     if (open) {
       setUserName('')
       setPassword('')
-      setRemember(false)
+      setConfirmPassword('')
       setError(null)
+      setRole('')
+      setSuccess(null)
     }
   }, [open])
 
@@ -38,6 +42,8 @@ export default function LoginModal({ open, onClose, onLoginSuccess, onSwitchToSi
     if (!/^\S+@\S+\.\S+$/.test(userName)) return 'Enter a valid userName'
     if (!password) return 'Password is required'
     if (password.length < 6) return 'Password must be at least 6 characters'
+    if (password !== confirmPassword) return 'Passwords do not match'
+    if (!role) return 'Role is required'
     return null
   }
 
@@ -53,18 +59,16 @@ export default function LoginModal({ open, onClose, onLoginSuccess, onSwitchToSi
     setError(null)
 
     try {
-      const res = await fetch('/api/login', {
+      const res = await fetch('/api/register', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ username: userName, password }),
+        body: JSON.stringify({userName, password, role }),
       })
 
       const data = await res.json().catch(() => ({}))
 
       if (res.ok) {
-        onClose()
-        onLoginSuccess?.()
-        router.push('/profile')
+        setSuccess("Succesfully registerd. Please use your credential to login")
       } else {
         setError(data?.message || 'Invalid credentials')
       }
@@ -86,7 +90,7 @@ export default function LoginModal({ open, onClose, onLoginSuccess, onSwitchToSi
           ×
         </button>
         <h2 id="login-heading" className={styles.title}>
-          Sign in
+          Sign UP
         </h2>
 
         {error && (
@@ -94,6 +98,12 @@ export default function LoginModal({ open, onClose, onLoginSuccess, onSwitchToSi
             {error}
           </div>
         )}
+        {
+          success && (
+            <div className={styles.success} role="alert">
+              {success}
+            </div>
+          )}
 
         <form onSubmit={handleSubmit} className={styles.form}>
           <label className={styles.label}>
@@ -116,40 +126,48 @@ export default function LoginModal({ open, onClose, onLoginSuccess, onSwitchToSi
               required
               placeholder="••••••••"
             />
+            
+           
+
+          </label>
+          <label className={styles.label}>
+            <span>Confirm Password</span> 
+          <input
+              type="password"
+              value={confirmPassword}
+              onChange={(e) => setConfirmPassword(e.target.value)}
+              required
+              placeholder="••••••••"
+            />
+          </label>
+          <label className={styles.label}>
+            <span>Role</span>
+          <select id="role " name="role" value={role} required onChange={(e)=>setRole(e.target.value)}>
+              <option value="">Select One</option>
+              <option value="User">User</option>
+              <option value="Admin">Admin</option>
+            </select>
           </label>
 
-          <div className={styles.row}>
-            <label className={styles.checkbox}>
-              <input
-                type="checkbox"
-                checked={remember}
-                onChange={(e) => setRemember(e.target.checked)}
-                aria-label="Remember me"
-              />
-              <span>Remember me</span>
-            </label>
-            <a href="/forgot-password" className={styles.forgotLink}>
-              Forgot?
-            </a>
-          </div>
+
 
           <button type="submit" className={styles.submit} disabled={loading}>
-            {loading ? 'Signing in…' : 'Sign in'}
+            {loading ? 'Signing up…' : 'Sign up'}
           </button>
         </form>
 
         <p className={styles.footerText}>
-          Don&apos;t have an account?{' '}
+          Have an account?{' '}
           <a
             href="#"
             className={styles.signupLink}
             onClick={(e) => {
               e.preventDefault()
               onClose()
-              onSwitchToSignup?.()
+              onSwitchToSignin?.()
             }}
           >
-            Sign up
+            Sign in
           </a>
         </p>
       </div>

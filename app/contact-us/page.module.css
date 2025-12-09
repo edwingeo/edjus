@@ -88,6 +88,27 @@
   border: 1px solid var(--border-color);
 }
 
+.statusMessage {
+  margin-bottom: 1.25rem;
+  padding: 0.875rem 1rem;
+  border-radius: 10px;
+  font-weight: 600;
+  border: 1px solid transparent;
+  box-shadow: var(--shadow-sm);
+}
+
+.error {
+  background: rgba(255, 71, 87, 0.08);
+  border-color: var(--accent-red);
+  color: #ff9aa5;
+}
+
+.success {
+  background: rgba(52, 211, 153, 0.12);
+  border-color: #34d399;
+  color: #a8f7d6;
+}
+
 .formGroup {
   margin-bottom: 1.5rem;
 }
@@ -140,6 +161,13 @@
   box-shadow: var(--shadow-md);
 }
 
+.submitButton:disabled {
+  opacity: 0.7;
+  cursor: not-allowed;
+  box-shadow: var(--shadow-sm);
+  transform: none;
+}
+
 .submitButton:hover {
   transform: translateY(-2px);
   box-shadow: var(--shadow-lg);
@@ -177,4 +205,3 @@
     padding: 2rem;
   }
 }
-

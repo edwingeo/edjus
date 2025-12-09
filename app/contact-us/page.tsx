@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect, type ChangeEvent, type FormEvent } from 'react'
 import styles from './page.module.css'
 
 export default function ContactUs() {
@@ -10,9 +10,30 @@ export default function ContactUs() {
     subject: '',
     message: '',
   })
+  const [error, setError] = useState<string | null>(null)
+  const [loading, setLoading] = useState(false)
+  const [success, setSuccess] = useState<string | null>(null)
+  useEffect(() => {
+      setFormData({
+        name: '',
+        email: '',
+        subject: '',
+        message: '',
+      })
+      setError(null)
+      setSuccess(null)
+  }, [])
+
+  const validate = () => {
+    if (!formData.name) return 'Name is required'
+    if (!formData.email) return 'Email is required'
+    if (!/^\S+@\S+\.\S+$/.test(formData.email)) return 'Enter a valid Email'
+    if (!formData.subject) return 'Subject is required'
+    return null
+  }
 
   const handleChange = (
-    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
+    e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
   ) => {
     setFormData({
       ...formData,
@@ -20,12 +41,42 @@ export default function ContactUs() {
     })
   }
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: FormEvent) => {
     e.preventDefault()
-    // Handle form submission here
-    console.log('Form submitted:', formData)
-    alert('Thank you for your message! We will get back to you soon.')
-    setFormData({ name: '', email: '', subject: '', message: '' })
+    setError(null)
+    setSuccess(null)
+    const validationError = validate()
+    if (validationError) {
+      setError(validationError)
+      return
+    }
+
+    setLoading(true)
+    try {
+      const res = await fetch('/api/contacts', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(formData),
+      })
+
+      const data = await res.json().catch(() => ({}))
+
+      if (res.ok) {
+        setSuccess('Successfully registered your inquiry. Our team will contact you soon!')
+        setFormData({
+          name: '',
+          email: '',
+          subject: '',
+          message: '',
+        })
+      } else {
+        setError(data?.message || 'Invalid credentials')
+      }
+    } catch (err) {
+      setError('Network error')
+    } finally {
+      setLoading(false)
+    }
   }
 
   return (
@@ -52,16 +103,19 @@ export default function ContactUs() {
             <p className={styles.infoText}>Edwin George : +1 (365) 378-2991</p>
             <p className={styles.infoText}>Justin Jacob : +1 (306) 262-2648</p>
           </div>
-          {/* <div className={styles.infoCard}>
-            <div className={styles.infoIcon}>📍</div>
-            <h3 className={styles.infoTitle}>Address</h3>
-            <p className={styles.infoText}>
-              123 Business Street<br />
-              Suite 100<br />
-              City, Province, Canada
-            </p>
-          </div> */}
         </div>
+        
+        {error && (
+          <div className={`${styles.statusMessage} ${styles.error}`} role="alert">
+            {error}
+          </div>
+        )}
+        {success && (
+          <div className={`${styles.statusMessage} ${styles.success}`} role="alert">
+            {success}
+          </div>
+        )}
+
 
         <form className={styles.contactForm} onSubmit={handleSubmit}>
           <div className={styles.formGroup}>
@@ -119,7 +173,12 @@ export default function ContactUs() {
               required
             />
           </div>
-          <button type="submit" className={styles.submitButton}>
+          <button
+            type="submit"
+            className={styles.submitButton}
+            disabled={loading}
+            aria-busy={loading}
+          >
             Send Message
           </button>
         </form>
@@ -127,4 +186,3 @@ export default function ContactUs() {
     </div>
   )
 }
-

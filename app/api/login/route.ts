@@ -26,7 +26,7 @@ export async function POST(request: Request) {
     return NextResponse.json({ message: 'No access token returned' }, { status: 500 })
   }
 
-  const response = NextResponse.json({ access_token: data.access_token })
+  const response = NextResponse.json({ access_token: data.access_token, roles: data.user.roles || [] })
   response.cookies.set('token', data.access_token, {
     httpOnly: true,
     sameSite: 'lax',

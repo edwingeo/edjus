@@ -62,8 +62,12 @@ export default function LoginModal({ open, onClose, onLoginSuccess, onSwitchToSi
       const data = await res.json().catch(() => ({}))
 
       if (res.ok) {
-        onClose()
+        // store roles and optional authenticated flag
+        localStorage.setItem('roles', JSON.stringify(data.roles || []))
+        localStorage.setItem('authenticated', 'true')
+        // Notify header
         onLoginSuccess?.()
+        onClose()
         router.push('/profile')
       } else {
         setError(data?.message || 'Invalid credentials')
